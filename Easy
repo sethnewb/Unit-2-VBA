@@ -1,0 +1,69 @@
+Sub Easy()
+' Homework Answer for the Easy Portion
+' Includes full Workbook Loop
+
+' Turn off Screen Updates for faster run time
+    Application.ScreenUpdating = False
+
+' WkSh is the worksheet
+'   Used in full Workbook Loop
+' LRow is the last row used in Column A
+' NxRow is the next row to be used in Column I
+' TlVolume is the running total in Column G
+'   Resets after ticker symbol change
+
+    Dim WkSh As Worksheet
+    Dim LRow As Long
+    Dim NxRow As Long
+    Dim TlVolume As Double
+
+    For Each WkSh In ThisWorkbook.Sheets
+
+' Ensure that every worksheet is in Alphabetical and Chronological order
+        WkSh.Columns("A:G").Sort Key1:=WkSh.Range("B1"), _
+        Order1:=xlAscending, Header:=xlYes
+        WkSh.Columns("A:G").Sort Key1:=WkSh.Range("A1"), _
+        Order1:=xlAscending, Header:=xlYes
+
+' Setting all variables that need to be set before Loops
+        LRow = WkSh.Cells(Rows.Count, 1).End(xlUp).Row
+        NxRow = 1
+        TlVolume = 0
+        LOpen = WkSh.Range("C2")
+
+' Add Headers
+        WkSh.Range("I1") = "Ticker"
+        WkSh.Range("J1") = "Total Stock Volume"
+
+' For Loop that loops down Column A
+'   If the next cell is the same as current cell
+'       Add volume in Column G to Total Volume
+'   If the next cell is not the same as current cell
+'       Add volume in Column G to Total Volume
+'       Add 1 to Next Row
+'       Ticker Symbol
+'       Total Volume
+'       Reset Total Volume to 0
+    
+        For TickerList = 2 To LRow
+            If WkSh.Cells(TickerList, 1) = WkSh.Cells(TickerList + 1, 1) Then
+                TlVolume = TlVolume + WkSh.Cells(TickerList, 7)
+            Else
+                TlVolume = TlVolume + WkSh.Cells(TickerList, 7)
+                NxRow = NxRow + 1
+                WkSh.Cells(NxRow, 9) = WkSh.Cells(TickerList, 1)
+                WkSh.Cells(NxRow, 10) = TlVolume
+                TlVolume = 0
+            End If
+        Next TickerList
+    
+' Clean up and Formatting
+'   AutoFit all Cells
+        WkSh.Cells.Columns.AutoFit
+
+    Next WkSh
+    
+' Turn Screen Updating Back on
+    Application.ScreenUpdating = True
+    
+End Sub
